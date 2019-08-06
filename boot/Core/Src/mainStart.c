@@ -1,12 +1,7 @@
 #include "mainStart.h"
-#include "flash.h"
-#include "sys.h"
-#include <string.h>
 
 typedef void (*pFunction)(void);
 
-
-void StartBootloader(void);
 void sMain(void)
 {
 	//HAL_UART_Receive_IT(&huart1, (uint8_t *)rxBuff, sizeof(rxBuff));
@@ -15,7 +10,7 @@ void sMain(void)
 	Flash_If_Read(&buf,0x0800DC00,1);
 
 	if(buf == 0xA0){
-		StartBootloader();
+		bootMode();
 	}else{
 		JumpToApp();
 	}
@@ -42,17 +37,33 @@ void boot_GetVersion(void)
 	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
 }
 
-void StartBootloader(void)
+void bootMode(void)
 {
-	uint8_t buf[100];
-	char version[7];
+	char buf[50];
+	uint8_t version[2];
+	uint8_t cmd;
 	uint16_t length=0;
+	HAL_StatusTypeDef sta;
+
+	Flash_If_Read(version,0x0800DC01,2);
+	length = snprintf(buf, sizeof(buf),"bootloader version %03d.%03d\r\n", version[0],version[1]);
+	length += snprintf(buf+length, sizeof(buf)-length,"start upgrade? Y/N\r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
+	HAL_UART_Receive_IT(&huart1,&cmd,1);
 
 
-	Flash_If_Read(buf,0x0800DC01,2);
-	length = snprintf(version, sizeof(version),"%d", buf[0]);
-	HAL_UART_Transmit(&huart1,(uint8_t *)version,length,100);
-
+	if(sta == HAL_OK){
+		if(cmd == "Y"){
+			length = snprintf(buf, sizeof(buf),"waitting upgrade...\r\n");
+			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
+		}else{
+			length = snprintf(buf, sizeof(buf),"close upgrade!!\r\n");
+			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
+		}
+	}else{
+		length = snprintf(buf, sizeof(buf),"upgrade fail!!\r\n");
+		HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
+	}
 }
 
 

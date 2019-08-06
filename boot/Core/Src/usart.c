@@ -106,6 +106,10 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
   }
 } 
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	UNUSED(huart);
+}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
