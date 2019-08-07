@@ -6,6 +6,7 @@
  */
 #include "flash.h"
 #include "sys.h"
+#include "bootloader.h"
 #include <string.h>
 
 #ifndef INC_MAINSTART_H_
