@@ -49,20 +49,19 @@ void bootMode(void)
 	length = snprintf(buf, sizeof(buf),"bootloader version %03d.%03d\r\n", version[0],version[1]);
 	length += snprintf(buf+length, sizeof(buf)-length,"start upgrade? Y/N\r\n");
 	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
-	HAL_UART_Receive_IT(&huart1,&cmd,1);
+	sta = HAL_UART_Receive_IT(&huart1,&cmd,1);
 
-
-	if(sta == HAL_OK){
+	while(1){
 		if(cmd == "Y"){
 			length = snprintf(buf, sizeof(buf),"waitting upgrade...\r\n");
 			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
-		}else{
+		}else if(cmd == "N"){
 			length = snprintf(buf, sizeof(buf),"close upgrade!!\r\n");
 			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
+		}else{
+			length = snprintf(buf, sizeof(buf),"upgrade fail!!\r\n");
+			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
 		}
-	}else{
-		length = snprintf(buf, sizeof(buf),"upgrade fail!!\r\n");
-		HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
 	}
 }
 
