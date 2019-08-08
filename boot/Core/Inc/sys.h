@@ -7,6 +7,7 @@
 #include "stm32f0xx.h"
 #include "stdint.h"
 #include "usart.h"
+#include <string.h>
 
 #ifndef INC_SYS_H_
 #define INC_SYS_H_

@@ -11,6 +11,7 @@
 
 #define appStartAddress	0x08003C00
 #define eepStartAddress 0x0800DC00
+#define bootloaderVersionAddress	0x08003BFE
 
 //pageSize 1=1024byte
 #define bootFlashPage	10
