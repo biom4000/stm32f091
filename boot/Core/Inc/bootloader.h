@@ -22,5 +22,6 @@
 
 HAL_StatusTypeDef bootMode(void);
 HAL_StatusTypeDef eraseFlashApp(void);
+HAL_StatusTypeDef getBootloaderVersion(void);
 
 #endif /* INC_BOOTLOADER_H_ */

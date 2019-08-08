@@ -34,12 +34,10 @@ HAL_StatusTypeDef bootMode(void)
 			sta = eraseFlashApp();
 			break;
 		case bootModeGetVersion:
-			length = snprintf(buf, sizeof(buf),"version\r\n");
-			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+			sta = getBootloaderVersion();
 			break;
 		case bootModeRead:
-			length = snprintf(buf, sizeof(buf),"read\r\n");
-			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+			sta = readFlashapp();
 			break;
 		case bootModeWrite:
 			length = snprintf(buf, sizeof(buf),"write\r\n");
@@ -49,6 +47,39 @@ HAL_StatusTypeDef bootMode(void)
 			break;
 	}
 	sta=HAL_OK;
+	return sta;
+}
+
+HAL_StatusTypeDef readFlashapp(void)
+{
+	uint16_t length=0;
+	char buf[50];
+	HAL_StatusTypeDef sta;
+
+	length = snprintf(buf, sizeof(buf),"read\r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+
+	sta = Flash_If_Read(vboot,0x0800DC01,2);
+	length = snprintf(buf, sizeof(buf),"%03d,%03d\r\n",vboot[0],vboot[1]);
+	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+
+	return sta;
+}
+
+HAL_StatusTypeDef getBootloaderVersion(void)
+{
+	uint16_t length=0;
+	char buf[50];
+	uint8_t vboot[2];
+	HAL_StatusTypeDef sta;
+
+	length = snprintf(buf, sizeof(buf),"version\r\n");
+	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+
+	sta = Flash_If_Read(vboot,0x0800DC01,2);
+	length = snprintf(buf, sizeof(buf),"%03d,%03d\r\n",vboot[0],vboot[1]);
+	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+
 	return sta;
 }
 
@@ -63,9 +94,4 @@ HAL_StatusTypeDef eraseFlashApp(void)
 	sta = Flash_If_Erase(appStartAddress,appFlashPage);
 
 	return sta;
-}
-
-HAL_StatusTypeDef readFlashData(void)
-{
-
 }
