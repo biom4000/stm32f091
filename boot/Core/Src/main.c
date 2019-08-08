@@ -33,7 +33,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
 
-  sMain();
+  bootMain();
 }
 
 /**

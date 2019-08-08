@@ -2,17 +2,17 @@
 
 typedef void (*pFunction)(void);
 
-void sMain(void)
+void bootMain(void)
 {
 	//HAL_UART_Receive_IT(&huart1, (uint8_t *)rxBuff, sizeof(rxBuff));
 	uint8_t buf;
 
 	Flash_If_Read(&buf,eepStartAddress,1);
 
-	if(buf == 0xA0){
+	if(buf == bootEnter){
 		bootMode();
 	}else{
-		JumpToApp();
+		jumpToApp();
 	}
 
 	while(1){
@@ -21,26 +21,7 @@ void sMain(void)
 
 }
 
-
-void boot_GetVersion(void)
-{
-	char buf[100]="";
-	uint16_t length=0;
-	uint8_t s;
-
-	//s=readOneByteFlash(0x8003001);
-
-	//length += snprintf(buf+length, sizeof(buf)-length,"%0d.%0d", readOneByteFlash(0x800DC01),readOneByteFlash(0x800DC02));
-
-	length = snprintf(buf, sizeof(buf),"%0d.%0d", s,s);
-
-	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,100);
-}
-
-
-
-
-void JumpToApp(void)
+void jumpToApp(void)
 {
 	pFunction appEntry;
 	uint32_t appStack;

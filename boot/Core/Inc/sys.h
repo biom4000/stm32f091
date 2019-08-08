@@ -13,4 +13,6 @@
 
 UART_HandleTypeDef huart1;
 
+#define timeOutBus 100   //100ms
+
 #endif /* INC_SYS_H_ */
