@@ -76,20 +76,24 @@ HAL_StatusTypeDef writeFlashapp(void)
 HAL_StatusTypeDef readFlashapp(void)
 {
 	uint32_t length=0;
-	char buf[500000];
-	uint8_t flashData[appFlashSize];
-	uint8_t i;
+	char buf[100];
+	uint8_t flashData[FLASH_PAGE_SIZE];
+	uint32_t i,j;
 	HAL_StatusTypeDef sta;
 
 	length = snprintf(buf, sizeof(buf),"read\r\n");
 	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
 
-	sta = Flash_If_Read(flashData,appStartAddress,sizeof(flashData));
-	for(i=0; i<sizeof(flashData); i++){
-		length += snprintf(buf+length, sizeof(buf)-length,"0x%02X\r\n",flashData[i]);
-	}
+	for(i=0; i<(appFlashPage); i++){
+		sta = Flash_If_Read(flashData,(appStartAddress+(i*FLASH_PAGE_SIZE)),FLASH_PAGE_SIZE);
 
-	HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+		for(j=0; j<FLASH_PAGE_SIZE; j++){
+			length = snprintf(buf, sizeof(buf),"%X,",flashData[j]);
+			HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+		}
+		length = snprintf(buf, sizeof(buf),"\r\n-----------------------------\r\n");
+		HAL_UART_Transmit(&huart1,(uint8_t *)buf,length,timeOutBus);
+	}
 
 	return sta;
 }

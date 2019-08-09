@@ -6,21 +6,6 @@
  */
 #include "flash.h"
 
-
-HAL_StatusTypeDef Flash_If_Read(uint8_t* buff, uint32_t dest_addr, uint32_t Len)
-{
-    uint32_t i;
-
-    if( dest_addr >= eepStartAddress){
-		for(i = 0; i < Len; i++){
-				buff[i] = *(__IO uint8_t*)(dest_addr + i);
-		}
-		return HAL_OK;
-    }else{
-    	return HAL_ERROR;
-    }
-}
-
 HAL_StatusTypeDef Flash_If_Write(uint8_t *src, uint32_t dest_addr, uint32_t Len)
 {
   uint32_t i = 0;
@@ -32,6 +17,16 @@ HAL_StatusTypeDef Flash_If_Write(uint8_t *src, uint32_t dest_addr, uint32_t Len)
 	  }
   }
   return HAL_OK;
+}
+
+HAL_StatusTypeDef Flash_If_Read(uint8_t* buff, uint32_t dest_addr, uint32_t Len)
+{
+    uint32_t i;
+
+	for(i = 0; i < Len; i++){
+			buff[i] = *(__IO uint8_t*)(dest_addr + i);
+	}
+	return HAL_OK;
 }
 
 HAL_StatusTypeDef Flash_If_Erase(uint32_t Add, uint8_t pageSize)
@@ -47,7 +42,8 @@ HAL_StatusTypeDef Flash_If_Erase(uint32_t Add, uint8_t pageSize)
   eraseinitstruct.TypeErase = FLASH_TYPEERASE_PAGES;
   eraseinitstruct.PageAddress = Add;
   eraseinitstruct.NbPages = pageSize;
+  HAL_FLASH_Unlock();
   sta = HAL_FLASHEx_Erase(&eraseinitstruct, &PageError);
-
+  HAL_FLASH_Lock();
   return sta;
 }
